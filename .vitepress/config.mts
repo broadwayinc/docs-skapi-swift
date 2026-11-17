@@ -104,7 +104,7 @@ export default defineConfig({
         ],
       },
     ],
-    socialLinks: [{ icon: 'github', link: 'https://github.com/broadwayinc' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/broadwayinc/skapi-swift' }],
     footer: { message: 'skapi-swift 2.4.0', copyright: 'broadway Inc.' },
   },
   vite: {
