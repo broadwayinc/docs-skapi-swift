@@ -21,14 +21,13 @@ features:
   - title: Native Swift
     icon: 📱
     details: One Swift package with async/await calls and no third-party dependencies. Sessions are kept in the Keychain, and the same project works with your web app.
-    link: /introduction/getting-started
+    link: https://github.com/broadwayinc/skapi-swift
   - title: Build with your AI Agents
     icon: 🤖
     details: Let your AI agent build your backend with Skapi. Spend less time on infrastructure and more time building your application.
-    link: https://docs.skapi.com/introduction/getting-started.html#building-with-your-ai-agent
+    link: /introduction/getting-started.html#building-with-your-ai-agent
   - title: High Performance. Lower Costs.
     icon: ⚡
     details: A fully serverless architecture that scales with your application while keeping operating costs low.
-    link: https://docs.skapi.com/introduction/what-is-skapi.html
-
+    link: /introduction/getting-started.html
 ---
