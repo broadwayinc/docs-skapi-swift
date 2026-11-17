@@ -14,7 +14,7 @@ hero:
       text: Visit Skapi.com
       link: https://www.skapi.com
   image:
-    src: /sk-swift-sdk.svg
+    src: /sk-swift-sdk-v2.svg
     alt: Skapi logo with the Swift logo
 
 features:
