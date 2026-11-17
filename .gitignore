@@ -1,2 +1,16 @@
+# Dependencies
 node_modules/
 package-lock.json
+
+# VitePress build output and cache (deploy.py rebuilds before uploading)
+.vitepress/dist/
+.vitepress/cache/
+
+# Deploy script: holds the S3 bucket and CloudFront ids
+deploy.py
+
+# Editors and OS
+.DS_Store
+.vscode/
+.idea/
+*.log
