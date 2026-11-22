@@ -1,6 +1,6 @@
 # API Reference
 
-Every method of skapi-swift 2.4.0. `Skapi` is an actor: each call is `try await`. Each one throws [`SkapiError`](/introduction/errors) on failure. What skapi-js has and this SDK leaves out is listed in [Not Included](/introduction/not-included).
+Every method of skapi-swift 2.4.4. `Skapi` is an actor: each call is `try await`. Each one throws [`SkapiError`](/introduction/errors) on failure. What skapi-js has and this SDK leaves out is listed in [Not Included](/introduction/not-included).
 
 ## [Connection](/api-reference/connection)
 

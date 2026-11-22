@@ -21,7 +21,9 @@ These can come from any method below that takes the input or needs the state.
 | `INVALID_REQUEST` | `Fetch limit should be below 1000.` | `FetchOptions.limit` |
 | `INVALID_PARAMETER` | `"<value>" is invalid startKey key.` | `startKey` is not an object, `"start"` or `"end"` |
 | `NETWORK_ERROR` | `Network error` | no answer came back |
+| `TIMEOUT` | `No response for <timeout> seconds.` | nothing was sent or received for `timeout` seconds |
 | `TOO_MANY_REQUESTS` | `Too many requests: ...` | still refused after 6 automatic retries |
+| `TIMEOUT` | `Upload timeout: ...` | a file upload stalled: nothing moved for `timeout` seconds |
 
 `fetchOptions` is a [`FetchOptions`](/api-reference/connection#fetchoptions): `limit`, `fetchMore`, `ascending`, `startKey`. See [Paging](/database/fetch#paging). Methods that take it return `{"list": [...], "startKey": ..., "endOfList": Bool, "startKeyHistory": [...]}`.
 

@@ -20,7 +20,7 @@ With a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.4.0"),
+    .package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.4.4"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [.product(name: "Skapi", package: "skapi-swift")]),
@@ -173,7 +173,7 @@ try Skapi(projectId: String, storage: SkapiStorage? = nil, timeout: TimeInterval
 | option | default | what it does |
 |---|---|---|
 | `storage` | the Keychain | where the signed-in session is kept, see above |
-| `timeout` | `120` | seconds to wait for each request |
+| `timeout` | `120` | seconds a request may go with nothing moving before it fails. An upload that keeps moving is never cut off |
 | `targetCDN` | | leave it out: where the project's endpoint list is read from |
 | `encryption` | `nil` (off) | encrypts the data of private records on the device, see [Encrypting Private Data](/database/encryption) |
 | `urlSession` | `.shared` | the `URLSession` requests go through |

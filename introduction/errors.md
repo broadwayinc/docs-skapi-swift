@@ -40,6 +40,8 @@ The codes are the same ones skapi-js and skapi-py use, so a check written for on
 | `REQUEST_EXCEED` | Too many attempts. Wait and try again. |
 | `TOO_MANY_REQUESTS` | The server kept answering "too many requests" after 6 automatic retries. |
 | `NETWORK_ERROR` | No answer came back. The user stays signed in; try again when the network is back. |
+| `TIMEOUT` | Nothing was sent or received for `timeout` seconds (`No response for 120 seconds.` with the default), or a file upload stalled (`Upload timeout: ...`). Try again. |
+| `EXCEED_LIMIT` | The project is at a limit of its plan. On Trial and Standard, once the month's API requests are used up, every call is refused until the month ends with `This project has used its 500,000 API requests for this month. Requests are refused until the month ends. Consider upgrading your plan.` (the number is the plan's own limit). See [Plans and Limits](https://docs.skapi.com/introduction/plans.html#api-requests). |
 | `ERROR` | Anything else. The message says what happened. |
 
 [Encryption](/database/encryption) adds its own codes, such as `ENCRYPTION_LOCKED`; they are listed in the [Encryption reference](/api-reference/encryption).

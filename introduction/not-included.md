@@ -8,7 +8,6 @@ skapi-swift has every feature of skapi-py, plus the ones an app on a phone or a 
 | Web push notifications: `subscribeNotification()`, `unsubscribeNotification()`, `vapidPublicKey()`, `pushNotification()` | They use the browser's Push API with VAPID keys and a service worker. iOS and macOS deliver notifications through Apple's push service (APNs), which today's backend does not send to. |
 | WebRTC video and voice calls: `connectRTC()`, `closeRTC()` | They need a large native WebRTC library. [Realtime messages](/realtime/connecting) are included. |
 | HTML form helpers: passing a form element or a submit event to a method, and the form `response` and `redirect` options | There is no web page and no DOM in an app. Pass your values as [`JSON`](/introduction/getting-started#json-values) instead. |
-| The browser Project ID prompt | An app is built with its Project ID: pass it to `Skapi(projectId:)`. |
 | Upload and download progress callbacks | Not in this release. Uploads and downloads return when they are done. |
 | `forwardRequest` with `responseType: "response"` | The request is relayed and its answer stored by Skapi's server, so there is no live `Response` to hand over. The destination's status code is in [`forwardRequestHistory`](/api-bridge/forward-request#request-history). skapi-py leaves it out for the same reason. |
 

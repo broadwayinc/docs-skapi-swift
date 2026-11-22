@@ -13,7 +13,7 @@ let skapi = try Skapi(projectId: String, storage: SkapiStorage? = nil, timeout: 
 |---|---|
 | `projectId` | the Project ID from your project's Settings page on skapi.com |
 | `storage` | where the signed-in session is kept between launches. Left out: the Keychain on iOS and macOS (one Keychain service per project), memory elsewhere. `MemoryStorage()` forgets the session when the object goes away. See [Storage](#storage) and [Keeping users signed in](/introduction/getting-started#keeping-users-signed-in). |
-| `timeout` | seconds to wait for each request |
+| `timeout` | seconds a request may go with nothing moving before it fails. An upload that keeps moving is never cut off |
 | `targetCDN` | leave it out. The CDN the project's endpoint list is read from. |
 | `encryption` | `EncryptionOptions()` or your own options: encrypts the data of private records on this device before upload. See [EncryptionOptions](/api-reference/encryption#encryptionoptions). |
 | `urlSession` | the `URLSession` requests go through |
@@ -26,7 +26,7 @@ Properties:
 | property | |
 |---|---|
 | `projectId`, `service`, `owner` | the project, read without `await` |
-| `version` | `"2.4.0"`, read without `await` |
+| `version` | `"2.4.4"`, read without `await` |
 | `await skapi.user` | the signed-in profile (`JSON?`), see [user](/api-reference/authentication#user) |
 | `await skapi.session` | the tokens (`SkapiSession?`): `.idToken.jwtToken`, `.accessToken.jwtToken`, `.refreshToken` |
 | `await skapi.connection` | the last connection info from the server (`JSONObject?`) |
@@ -54,7 +54,7 @@ The project's name and settings, and the caller as the server sees it. `refresh:
     "user_agent": "MyApp/1 CFNetwork/1490.0.4 Darwin/23.2.0",
     "user_location": "KR",
     "service_name": "My Project",
-    "version": "2.4.0",
+    "version": "2.4.4",
     "ai_agent": null,
     "conf": {"prevent_signup": false, "require_login": false, "anonymous_login": false, ...},
     "encryption_recovery": {"code": null, "message": "..."}
