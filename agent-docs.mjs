@@ -2,7 +2,7 @@
 //
 // The same file is in docs-skapi-py, docs-skapi-swift and docs-skapi-kotlin; what differs per
 // site is in .vitepress/site.mjs (origin, SDK, sidebar). docs-skapi-js has its own, larger
-// agent-docs.mjs (it also builds SKAPI-full.md and pins the skapi-js version); the link and id
+// agent-docs.mjs (it also builds SKAPI-FULL.md and pins the skapi-js version); the link and id
 // rules below are the same as there.
 //
 // Writes into public/, which VitePress copies to the site root, so every file is served raw:
