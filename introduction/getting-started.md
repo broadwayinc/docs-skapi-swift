@@ -204,7 +204,7 @@ final class AppModel: ObservableObject {
 }
 ```
 
-A server or tool that acts for many users at once needs one object per user, each with its own `storage`.
+A program that signs in more than one user at once needs one object per user, each with its own `storage`.
 
 ## App lifecycle
 

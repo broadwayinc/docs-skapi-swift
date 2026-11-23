@@ -89,7 +89,7 @@ On an [anonymous](/authentication/anonymous) session, `logout()` deletes the tem
 
 ## Signing in with tokens
 
-[`loginWithToken(idToken:accessToken:refreshToken:)`](/api-reference/authentication#loginwithtoken) takes over a session that started somewhere else, for example a sign-in your own server made, or a web view running skapi-js that hands the user's tokens to your app.
+[`loginWithToken(idToken:accessToken:refreshToken:)`](/api-reference/authentication#loginwithtoken) takes over a session that started somewhere else, for example a web view running skapi-js that hands the user's tokens to your app.
 
 ```swift
 let user = try await skapi.loginWithToken(idToken: idToken, accessToken: accessToken, refreshToken: refreshToken)
