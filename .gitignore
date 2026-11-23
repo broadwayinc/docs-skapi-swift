@@ -14,6 +14,7 @@ deploy.py
 .vscode/
 .idea/
 *.log
+nohup.out
 
 # Written by agent-docs.mjs on every dev/build: the base prompt and the raw pages for AI agents
 public/SKAPI.md
