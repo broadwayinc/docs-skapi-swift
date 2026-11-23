@@ -2,8 +2,8 @@
   "name": "docs-skapi-swift",
   "private": true,
   "scripts": {
-    "dev": "vitepress dev --host",
-    "build": "vitepress build",
+    "dev": "node agent-docs.mjs && vitepress dev --host",
+    "build": "node agent-docs.mjs && vitepress build",
     "preview": "vitepress preview"
   },
   "dependencies": {

@@ -223,6 +223,26 @@ If you pass `observeAppLifecycle: false`, call `appDidReturn()` yourself when yo
 }
 ```
 
+## Building With Your AI Agent
+
+An AI coding agent can write your skapi-swift app. Give it Skapi's base prompt for skapi-swift:
+
+- **[SKAPI.md](https://ios.skapi.com/SKAPI.md)** (<a href="/SKAPI.md" download="SKAPI.md">download</a>): the rules for building an iOS or macOS app, a map of this documentation and an index of every skapi-swift method. Each entry links to its page under `https://ios.skapi.com/md/` (every page of this site as raw markdown), and the agent opens a page when it builds that feature, so it needs to be able to open public web pages.
+
+To use it:
+
+1. Download the file.
+2. Save it in your project folder under the name your agent reads (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md` ...), or attach it to your chat.
+3. Ask the agent to use it as its base prompt, with your Project ID:
+
+```text
+Use SKAPI.md as your base prompt.
+My Skapi project ID is "<Project ID>".
+Build me a [describe what you want].
+```
+
+With the [Skapi MCP server](https://mcp.skapi.com) connected, the agent can also create a project, register Secret Keys and Tickets, and read this documentation through its `readDocs` tool.
+
 ## Next
 
 - [Signing Up Users](/authentication/signup) and [Login / Logout](/authentication/login)
