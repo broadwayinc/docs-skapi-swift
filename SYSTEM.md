@@ -35,7 +35,7 @@ The app needs the user's Skapi Project ID. If the user has no project yet: when 
 
 ## Installing and Connecting
 
-skapi-swift needs iOS 15 or macOS 12 and Swift 5.9 (Xcode 15). In Xcode, add the package `https://github.com/broadwayinc/skapi-swift.git` (**File > Add Package Dependencies**) and the **Skapi** library to the app target, or in `Package.swift` add `.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.4.4")` and the product `.product(name: "Skapi", package: "skapi-swift")`. See [Install](/introduction/getting-started.md#install).
+skapi-swift needs iOS 15 or macOS 12 and Swift 5.9 (Xcode 15). In Xcode, add the package `https://github.com/broadwayinc/skapi-swift.git` (**File > Add Package Dependencies**) and the **Skapi** library to the app target, or in `Package.swift` add `.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.5.0")` and the product `.product(name: "Skapi", package: "skapi-swift")`. See [Install](/introduction/getting-started.md#install).
 
 ```swift
 import Skapi

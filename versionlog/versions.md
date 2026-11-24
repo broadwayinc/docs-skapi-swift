@@ -1,10 +1,28 @@
 # Version History
 
-### Current version: 2.4.4
+### Current version: 2.5.0
 
 ```swift
-.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.4.4")
+.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.5.0")
 ```
+
+**2.5.0**
+
+skapi-swift 2.5.0 has the record changes of skapi-js 2.6.0 and skapi-py 2.5.0.
+
+New:
+
+- **`source["can_modify_referencing_records"]`.** A record posted with `"source": ["can_modify_referencing_records": true]` lets its uploader change the `data`, `tags` and `index` of other users' records that reference it, or unlink them with `"reference": .null`, with [`postRecord`](/api-reference/database#postrecord) and the record's `record_id`. Nothing else of such a record can be changed this way, and private and read-only records are refused. The uploader can set it only when the record is created and can turn it off at any time; only the project owner and admins in access group `99` can turn it on for an existing record. A value other than a bool throws `INVALID_PARAMETER` (`"source.can_modify_referencing_records" should be type: <boolean>.`). Records come back with `source["can_modify_referencing_records"]` (`false` by default). See [Modifying referencing records](/database/reference#modifying-referencing-records).
+- **`record["updated_by"]`**: the user ID of whoever made the record's last update when that was not its uploader (the referenced record's uploader, the project owner or an admin). Absent when the uploader made the last update. It is never listed in `source`. See [Who changed a record](/database/reference#who-changed-a-record-updated-by).
+- A redacted `ip` reads as `""` (see below); `readonly`, `unique_id` and the `anonymous:` prefix of `user_id` read as before. A missing `ip` reads as `""` as well.
+- `skapiVersion` reads `"2.5.0"`.
+
+Fixes and changes on the server, for every SDK version:
+
+- **A record's IP address is returned only to its uploader, the project owner and admins in access group `99`.** Everyone else reads `ip` as `""`, or `"0.0.0.0"` for a record a signed-out user posted from an IPv4 address, so its `user_id` still starts with `anonymous:`. See [The record](/database/fetch#the-record).
+- **`"reference": .null` no longer lets a record into a higher access group.** A user can post a record in an access group above their own only when the request references a record (a reply to a record in that group). Unlinking with `"reference": .null`, or an update that keeps the record's reference but moves it to another access group, throws `User has no access to this group.` like any other post above the user's access group.
+- **A record that stops referencing a record leaves its lists.** After its reference is removed or changed, it is no longer returned by [`getRecords`](/api-reference/database#getrecords) with the old `reference` (tag and private record reads included), nor by the old referenced record's uploader's [`getFeed`](/api-reference/users#getfeed).
+- **Record files of type HTML, SVG, XML or JavaScript are downloaded instead of opened as pages.** Files attached to records are served with headers that keep a browser from running them. Images, video, audio and PDFs are not affected.
 
 **2.4.4**
 

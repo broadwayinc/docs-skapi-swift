@@ -151,6 +151,7 @@ Every record comes back as an object:
     "referencing_limit": null,
     "prevent_multiple_referencing": false,
     "can_remove_referencing_records": false,
+    "can_modify_referencing_records": false,
     "only_granted_can_reference": false
   },
   "referenced_count": 0,
@@ -169,6 +170,8 @@ Every record comes back as an object:
 | `data` | what was posted |
 | `referenced_count` | how many records reference this one |
 | `uploaded`, `updated` | milliseconds |
+| `ip` | the uploader's IP address, returned only to the uploader, the project owner and admins in access group `99`. Anyone else reads `""`, or `"0.0.0.0"` for a record a signed-out user posted from an IPv4 address (its `user_id` still starts with `anonymous:`). One posted from an IPv6 address reads `""`, and its `user_id` has no `anonymous:` prefix, as before. |
+| `updated_by` | only when someone other than the uploader made the last update: that user's ID. See [Who changed a record](/database/reference#who-changed-a-record-updated-by). |
 | `bin` | attached files, see [Files](/database/files#files-on-a-record) |
 
 Each entry in `bin` is an object with `access_group`, `filename`, `url`, `path`, `size` and `uploaded`.

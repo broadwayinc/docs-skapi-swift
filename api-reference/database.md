@@ -50,7 +50,7 @@ Creates a record, or updates the one named by `config["record_id"]`. Returns the
 | `index` | object or `null` | `["name": String, "value": string, number or bool]`. `null` removes it. |
 | `tags` | array of strings, or a comma-separated string | `null` or `[]` removes them. |
 | `reference` | string, `["record_id"]`, `["unique_id"]` or `null` | `null` removes it. |
-| `source` | object | `referencing_limit` (number or `null`), `prevent_multiple_referencing`, `can_remove_referencing_records`, `only_granted_can_reference`, `allow_granted_to_grant_others` (bools), `referencing_index_restrictions` (array of `["name", "value"?, "condition"?]`). See [Reference rules](/database/reference#reference-rules). |
+| `source` | object | `referencing_limit` (number or `null`), `prevent_multiple_referencing`, `can_remove_referencing_records`, `can_modify_referencing_records`, `only_granted_can_reference`, `allow_granted_to_grant_others` (bools), `referencing_index_restrictions` (array of `["name", "value"?, "condition"?]`). See [Reference rules](/database/reference#reference-rules). |
 | `remove_bin` | array of URLs or `bin` objects, or `null` | Files to remove. `null` removes every file; `[]` removes nothing. |
 
 Inside a config, `null` is written `nil` in a literal or `.null` elsewhere: `["record_id": "<record id>", "index": nil]`.
@@ -78,6 +78,8 @@ Inside a config, `null` is written `nil` in a literal or `.null` elsewhere: `["r
 | `INVALID_REQUEST` | `Public users can only post records to public tables.` / `Public users cannot update existing records.` / `Public users cannot set unique_id for records.` / `Public users cannot remove files from records.` / `Public users cannot post subscription records.` |
 | `INVALID_REQUEST` | `User has no access to update this record.` |
 | `INVALID_REQUEST` | `Record is read only.` |
+| `INVALID_REQUEST` | `"source.can_modify_referencing_records" can only be set when the record is created. Only the project owner and admins in access group 99 can turn it on for an existing record.` |
+| `INVALID_REQUEST` | `The referenced record's user can only change the data, tags and index of a record that references theirs, or unlink it (<field> differs).` / `The referenced record's user cannot update a private record.` / `User has no access to this group.` (see [Modifying referencing records](/database/reference#modifying-referencing-records)) |
 | `INVALID_REQUEST` | `Only the owner of a record can move it into or out of the private access group.` / `User has no access to change the private access of the record.` |
 | `INVALID_REQUEST` | `"__data__/__json__.json" is a reserved file name.` (a file named `__json__.json` under the name `__data__`) |
 

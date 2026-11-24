@@ -72,6 +72,8 @@ Moving a record into or out of `"private"` removes every [private access grant](
 | `INVALID_REQUEST` | `Record is read only.` | the record was created with `readonly: true` |
 | `INVALID_REQUEST` | `Public users cannot update existing records.` | you are signed out |
 
+The uploader of a record posted with `source["can_modify_referencing_records"] = true` can also change the `data`, `tags` and `index` of other users' records that reference it, or unlink them with `"reference": .null`. See [Modifying referencing records](/database/reference#modifying-referencing-records). When someone other than its uploader made a record's last update, the record has `updated_by`, that user's ID.
+
 ## Deleting records
 
 [deleteRecords(_:fetchOptions:)](/api-reference/database#deleterecords) needs a signed-in user. Files attached to a deleted record are deleted with it.
