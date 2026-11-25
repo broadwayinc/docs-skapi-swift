@@ -27,7 +27,7 @@ export default defineConfig({
     ],
     sidebar,
     socialLinks: [{ icon: 'github', link: 'https://github.com/broadwayinc/skapi-swift' }],
-    footer: { message: 'skapi-swift 2.5.0', copyright: 'broadway Inc.' },
+    footer: { message: 'skapi-swift 2.7.0', copyright: 'broadway Inc.' },
   },
   vite: {
     server: {

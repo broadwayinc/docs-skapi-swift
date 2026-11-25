@@ -26,7 +26,7 @@ Properties:
 | property | |
 |---|---|
 | `projectId`, `service`, `owner` | the project, read without `await` |
-| `version` | `"2.5.0"`, read without `await` |
+| `version` | `"2.7.0"`, read without `await` |
 | `await skapi.user` | the signed-in profile (`JSON?`), see [user](/api-reference/authentication#user) |
 | `await skapi.session` | the tokens (`SkapiSession?`): `.idToken.jwtToken`, `.accessToken.jwtToken`, `.refreshToken` |
 | `await skapi.connection` | the last connection info from the server (`JSONObject?`) |
@@ -37,7 +37,8 @@ Properties:
 |---|---|
 | `INVALID_PARAMETER` | `Project ID is required.` / `Project ID is invalid.` |
 | `INVALID_PARAMETER` | `"encryption.iterations" must be at least 100000.` |
-| `NOT_EXISTS` | `The project ID does not exist. Create your project from skapi.com` (thrown by the first call) |
+| `NOT_EXISTS` | `The project ID does not exist. Create your project from skapi.com` (thrown by the first call, when the CDN has no endpoint list for the project) |
+| `SERVER_ERROR`, `RATE_LIMITED`, `NETWORK_ERROR`, `TIMEOUT` | The first call could not read the project's endpoint list this time. Try again. |
 
 ## getConnectionInfo
 
@@ -54,7 +55,7 @@ The project's name and settings, and the caller as the server sees it. `refresh:
     "user_agent": "MyApp/1 CFNetwork/1490.0.4 Darwin/23.2.0",
     "user_location": "KR",
     "service_name": "My Project",
-    "version": "2.5.0",
+    "version": "2.7.0",
     "ai_agent": null,
     "conf": {"prevent_signup": false, "require_login": false, "anonymous_login": false, ...},
     "encryption_recovery": {"code": null, "message": "..."}

@@ -1,14 +1,44 @@
 # Version History
 
-### Current version: 2.5.0
+### Current version: 2.7.0
 
 ```swift
-.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.5.0")
+.package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.7.0")
 ```
+
+**2.7.0**
+
+skapi-swift 2.7.0 is aligned with skapi-js 2.7.0 (and its 2.5.0 request status push). There was no 2.5.0 or 2.6.0 release of skapi-swift: 2.7.0 is the first release after 2.4.4.
+
+Fixes:
+
+- **The package builds for macOS and iOS again.** 2.4.4 did not compile on Apple platforms (`invalid redeclaration of 'out'` in CryptoPrimitives.swift, and `reference to captured var 'self' in concurrently-executing code` in Lifecycle.swift with Swift 5.10), so apps could not add it. Both are fixed; checked with Swift 5.10 and 6.4.
+- **A passing failure no longer says the project does not exist.** The first call of a Skapi object reads the project's endpoint list from the CDN. Any failed read of it threw `NOT_EXISTS` ("The project ID does not exist"), so a login could fail once with `NOT_EXISTS` and work when tried again. Now only a missing list (the CDN answers 403 or 404) throws `NOT_EXISTS`; a server fault throws `SERVER_ERROR`, a rate limit `RATE_LIMITED`, a cut-off answer `NETWORK_ERROR`, and no answer in time `TIMEOUT`, all safe to try again.
+- **Request status frames no longer reach your realtime callback.** The server sends a `CSR_STATUS` frame to every realtime connection of a user whose forwarded request was sent with `notify`, also when another app of the same user (a web app on skapi-js) sent it. skapi-swift handed it to the [connectRealtime](/api-reference/realtime#connectrealtime) callback as a `"private"` event with no sender; it now goes to [onRequestStatus](/api-reference/api-bridge#onrequeststatus) only.
+- **Polls survive a bad network.** [forwardRequestPoll](/api-reference/api-bridge#forwardrequestpoll), [forwardRequestStream](/api-reference/api-bridge#forwardrequeststream), and [forwardRequest](/api-reference/api-bridge#forwardrequest) with `poll` or `stream` ended with the first failed check. A check that fails on the way (`NETWORK_ERROR`, `TIMEOUT`, `RATE_LIMITED`, `TOO_MANY_REQUESTS`, `SERVER_ERROR`, or no sign-in token) is now tried again, waiting twice as long each time up to 30 seconds. A `401` refreshes the token once. While signed out the poll waits for a sign in. Only the server's own answer ends it.
+- **Server failures and rate limits are told apart from refusals.** A status of 500 or above (except 501) throws `SERVER_ERROR`, with the server's answer in `cause`, instead of whatever code its body carried. A "too many requests" answer without a wait time throws `RATE_LIMITED` (was `ERROR`); for a file upload it is `TOO_MANY_REQUESTS`. See [Errors](/introduction/errors).
+- **A token refresh that gets no answer no longer holds every call.** A call waits at most 15 seconds for it, then throws `TIMEOUT`; the user stays signed in and the next call starts a new refresh. The refresh after a profile change ([updateProfile](/api-reference/authentication#updateprofile), [verifyEmail](/api-reference/authentication#verifyemail), [lastVerifiedEmail](/api-reference/authentication#lastverifiedemail), [getProfile(refreshToken: true)](/api-reference/authentication#getprofile)) waits as long as it takes, as in skapi-js, and a slower refresh that started before the change can no longer bring back the old profile.
+- **Cancelling a task takes its request off the network.** The call throws `ABORTED`, also while it waits for a token refresh or a `429` wait time. Before, the request ran on until it finished.
+- **The package builds on Linux** with Swift 5.10 (WebSocket send and receive use the async forms).
+
+New:
+
+- **`cref` on [forwardRequest](/api-reference/api-bridge#forwardrequest)**: your own reference for a request, handed back by the reply and every read. See [Finding a request again](/api-bridge/forward-request#finding-a-request-again).
+- **[forwardRequestStatus](/api-reference/api-bridge#forwardrequeststatus)**, **[forwardRequestQueueCounters](/api-reference/api-bridge#forwardrequestqueuecounters)** and **[forwardRequestRead](/api-reference/api-bridge#forwardrequestread)**: where many requests stand in one call, the counters of up to 20 queues, and one request in full whatever its state.
+- **`ifAbsent` on [forwardRequestFinalize](/api-reference/api-bridge#forwardrequestfinalize)**: store only when no result is stored yet (`{"finalized": false, "reason": "exists"}` otherwise).
+- **`fields: "ids"` and `after` on [forwardRequestHistory](/api-reference/api-bridge#forwardrequesthistory)**, and `cref` on its rows.
+- **`deadline`** (milliseconds, then `TIMEOUT`) on [forwardRequestHistory](/api-reference/api-bridge#forwardrequesthistory), [forwardRequestStatus](/api-reference/api-bridge#forwardrequeststatus), [forwardRequestQueueCounters](/api-reference/api-bridge#forwardrequestqueuecounters) and [forwardRequestRead](/api-reference/api-bridge#forwardrequestread). `fresh` is accepted for code shared with skapi-js and changes nothing: skapi-swift never joins a read to another one. skapi-js's `signal` is the task's cancellation (`ABORTED`).
+- **Request status push**: `notify` on [forwardRequest](/api-reference/api-bridge#forwardrequest), `notify:` on [forwardRequestPoll](/api-reference/api-bridge#forwardrequestpoll), and [onRequestStatus / isRequestStatusLive](/api-reference/api-bridge#onrequeststatus). See [Status push](/api-bridge/forward-request#status-push).
+- `SkapiError.isTokenFailure`.
+- `skapiVersion` reads `"2.7.0"`.
+
+Changes on the server, for every SDK version:
+
+- **`queue_exact` reads only the named queue on the server.** Requests queued before 2026-06-05 were stored under an older queue format and are not listed with `"queue_exact": true`; list the queue without it to see those. See [Exact queue matching](/api-bridge/forward-request#exact-queue-matching).
 
 **2.5.0**
 
-skapi-swift 2.5.0 has the record changes of skapi-js 2.6.0 and skapi-py 2.5.0.
+skapi-swift 2.5.0 has the record changes of skapi-js 2.6.0 and skapi-py 2.5.0. Never released: they ship in 2.7.0, so install 2.7.0 to use them.
 
 New:
 

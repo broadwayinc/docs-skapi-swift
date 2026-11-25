@@ -29,6 +29,8 @@ let answer = try await skapi.forwardRequest([
 | `secretName` | A client secret to fill in, see below. |
 | `skapiHeaders` | Tell the destination who is calling, see below. |
 | `queue`, `poll`, `stream`, `expires` | See [Queued requests](#queued-requests) and [Streamed requests](#streamed-requests). |
+| `cref` | Your own reference for the request, see [Finding a request again](#finding-a-request-again). |
+| `notify` | Status push for a queued request, see [Status push](#status-push). |
 | `multipart` | `true` sends the `multipart:` parts as a multipart body, see below. |
 | `responseType` | `"json"` parses a string answer (a string that does not parse comes back unchanged); `"text"` gives a string, turning anything else into JSON text. |
 
@@ -147,6 +149,8 @@ let result = try await skapi.forwardRequest([
 
 The first check goes out after one interval. There is no time limit: the call returns when the request settles. Cancelling the task that runs it stops the waiting (the request itself goes on, on the server).
 
+The waiting survives a bad network. A check that fails on the way (no network, no answer in time, too many requests, a server error, or a sign-in token refresh that got no answer) is tried again on a later check, waiting twice as long each time up to 30 seconds. A `401` from the gateway refreshes the token once. While the user is signed out it waits for a sign in, sending nothing. Only the server's own answer ends it, so a phone going through a tunnel does not lose the answer.
+
 What a settled request returns:
 
 - `resolved`: the destination's answer, as it is. An answer with a `"status"` key of its own (even `"pending"`) is returned, not waited on: only Skapi's envelope, which has `in_queue`, means the request is still waiting. The same goes for `"chunks"` or `"more"` in the answer: they are the destination's data, never handed to `onStream` as streamed text.
@@ -167,6 +171,64 @@ let again = try await skapi.forwardRequestPoll(env["id"]?.string ?? "",
 ```
 
 Only the caller who made a request can read it. A signed-in caller is the user, on any device. A signed-out caller is the IP address and User-Agent pair, so a request made signed out must be polled, cancelled and finalized from the same IP with the same User-Agent; otherwise it is `NOT_EXISTS` (`Request not found.`). A phone moving between Wi-Fi and a cellular network changes its IP, so sign the user in for requests you read later.
+
+## Finding a request again
+
+When the app is sent to the background or the network drops while `forwardRequest` waits for its reply, you cannot tell whether the request reached the server. Send it with a `cref` of your own (1 to 64 letters, digits, `_` or `-`, new for every request) and look for it before sending it again: the `cref` is stored on the request and handed back by the reply, [forwardRequestHistory](#request-history), [forwardRequestStatus](/api-reference/api-bridge#forwardrequeststatus) and [forwardRequestRead](/api-reference/api-bridge#forwardrequestread).
+
+```swift
+let cref = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+let env = try await skapi.forwardRequest(["url": "https://api.example.com/v1/chat", "data": ["q": "Hi"],
+                                          "queue": "chat", "cref": .string(cref)])
+// env["cref"] == cref
+```
+
+## Checking many requests at once
+
+An app that shows several unfinished requests can ask where all of them stand in one call when it comes back to the foreground, instead of polling each:
+
+- [forwardRequestStatus(_:options:)](/api-reference/api-bridge#forwardrequeststatus) reads up to 100 requests per call: status (`"missing"` for one you cannot see), whether a result is stored, stream position, times and `cref`. No bodies.
+- [forwardRequestQueueCounters(_:options:)](/api-reference/api-bridge#forwardrequestqueuecounters) reads a few bytes per queue (up to 20). `rct` grows when a request on the queue finishes and `seq` when one is added, so read these on every check and the requests only when a counter moved.
+- [forwardRequestRead(_:)](/api-reference/api-bridge#forwardrequestread) reads one request in full, always as `{"id", "status", "body"?, "error"?, "chunks"?, ...}`: a resolved request does not come back as its bare answer, and a failed stream comes back with the text it got.
+
+```swift
+let status = try await skapi.forwardRequestStatus(unfinished.map { .string($0) }, options: ["deadline": 15000])
+for item in status["list"]?.array ?? [] where item["status"]?.string == "resolved" {
+    let full = try await skapi.forwardRequestRead(["id": item["id"] ?? .null, "url": "https://api.example.com/v1/chat", "method": "POST"])
+    print(full["body"] ?? .null)
+}
+```
+
+`deadline` (milliseconds) bounds each of these calls and [forwardRequestHistory](#request-history): past it, the call throws `TIMEOUT`. Cancelling the task that awaits one stops it with `ABORTED`.
+
+## Status push
+
+`"notify": true` on a queued request asks the server to tell this user's realtime connections each time the request changes status. A poll of it then reads the request only when a status change names it, plus once a minute, instead of at every interval: fewer reads, and an answer that shows up as soon as it settles. It needs a signed-in user and a queue. It is only an accelerator: with no connection, no frames or an older server, the poll runs at its normal interval.
+
+```swift
+let result = try await skapi.forwardRequest([
+    "url": "https://api.example.com/v1/slow-report",
+    "queue": "reports",
+    "poll": 2000,
+    "notify": true,
+])
+```
+
+A request you queued without `poll` replies with `"notify": true` when the server accepted it; pass it on: `forwardRequestPoll(requestId, notify: true)`.
+
+To hear about every status change of the user's `notify` requests, including ones this app holds no poll for (sent from another device, or queued by the server as the continuation of one), use [onRequestStatus](/api-reference/api-bridge#onrequeststatus):
+
+```swift
+let stop = skapi.onRequestStatus { event in
+    switch event.type {
+    case "status": print(event.id ?? "", event.status ?? "")   // a hint: read the request for the outcome
+    case "connected": print("re-read what you show")              // frames are not kept while disconnected
+    default: break
+    }
+}
+```
+
+The realtime connection is opened for this when the app has none (and a user is signed in), and closed again 10 minutes after nothing needs it, unless the app joined a group on it. These frames never reach your own [realtime](/realtime/connecting) callback.
 
 ## Streamed requests
 
@@ -230,6 +292,12 @@ try await skapi.forwardRequestFinalize(requestId, data: .string(reader.answer))
 // {"finalized": true, "message": "Finalized."}
 ```
 
+When more than one device may settle the same turn, pass `"ifAbsent": true`: the answer is stored only when none is stored yet, and otherwise nothing changes and you get `{"finalized": false, "reason": "exists"}`, so a partial answer never replaces a complete one.
+
+```swift
+try await skapi.forwardRequestFinalize(requestId, data: .string(reader.answer), options: ["ifAbsent": true])
+```
+
 Only a settled request can be finalized. After three failed reads of the pieces in a row on a settled request, the read gives up and returns what it has, so check your text is complete before you finalize it.
 
 ## Request history
@@ -252,7 +320,15 @@ for item in history["list"]?.array ?? [] {
 }
 ```
 
-`"compact": true` leaves the bodies out and gives short `request_text` and `response_text` instead. The listing pages like [getRecords](/database/fetch#paging).
+`"compact": true` leaves the bodies out and gives short `request_text` and `response_text` instead. `"fields": "ids"` lists only each request's id, status, times, queue and `cref`. `"after": "<stamp>:<entropy>"` lists only the requests newer than that one. The listing pages like [getRecords](/database/fetch#paging).
+
+### Exact queue matching
+
+`queue` alone matches as a prefix: `"u1"` also lists the requests of `"u1-bg"`. With `"queue_exact": true` only the named queue is read. `"queue_exclude"` leaves one queue out, after the read, so a page can come back short while more remain: keep paging until `endOfList`.
+
+::: warning Requests queued before 2026-06-05
+Requests queued before 2026-06-05 were stored under an older queue format and are not listed with `"queue_exact": true`. List the queue without it to see those.
+:::
 
 ## Cancelling and counting
 

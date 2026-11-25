@@ -1,6 +1,6 @@
 # API Reference
 
-Every method of skapi-swift 2.5.0. `Skapi` is an actor: each call is `try await`. Each one throws [`SkapiError`](/introduction/errors) on failure. What skapi-js has and this SDK leaves out is listed in [Not Included](/introduction/not-included).
+Every method of skapi-swift 2.7.0. `Skapi` is an actor: each call is `try await`. Each one throws [`SkapiError`](/introduction/errors) on failure. What skapi-js has and this SDK leaves out is listed in [Not Included](/introduction/not-included).
 
 ## [Connection](/api-reference/connection)
 
@@ -91,9 +91,12 @@ Every method of skapi-swift 2.5.0. `Skapi` is an actor: each call is `try await`
 | method | |
 |---|---|
 | [`forwardRequest(_:form:multipart:onStream:)`](/api-reference/api-bridge#forwardrequest) | calls another API through Skapi, with your client secrets |
-| [`forwardRequestPoll(_:poll:url:method:onStream:service:owner:)`](/api-reference/api-bridge#forwardrequestpoll) / [`forwardRequestStream(_:options:onStream:)`](/api-reference/api-bridge#forwardrequeststream) | waits for a queued or streamed answer |
+| [`forwardRequestPoll(_:poll:url:method:onStream:service:owner:notify:)`](/api-reference/api-bridge#forwardrequestpoll) / [`forwardRequestStream(_:options:onStream:)`](/api-reference/api-bridge#forwardrequeststream) | waits for a queued or streamed answer |
 | [`forwardRequestFinalize(_:data:options:)`](/api-reference/api-bridge#forwardrequestfinalize) | stores a streamed request's final answer |
 | [`forwardRequestHistory(_:fetchOptions:)`](/api-reference/api-bridge#forwardrequesthistory) | past forwarded requests and their answers |
+| [`forwardRequestStatus(_:options:)`](/api-reference/api-bridge#forwardrequeststatus) / [`forwardRequestQueueCounters(_:options:)`](/api-reference/api-bridge#forwardrequestqueuecounters) | where many requests and queues stand, in one call |
+| [`forwardRequestRead(_:)`](/api-reference/api-bridge#forwardrequestread) | one request in full, whatever its state |
+| [`onRequestStatus(_:)`](/api-reference/api-bridge#onrequeststatus) / [`isRequestStatusLive()`](/api-reference/api-bridge#onrequeststatus) | status push for requests sent with `notify` |
 | [`cancelForwardRequest(_:)`](/api-reference/api-bridge#cancelforwardrequest) / [`forwardRequestQueueCount(_:)`](/api-reference/api-bridge#forwardrequestqueuecount) | queue control |
 | [`FormPart`](/api-reference/api-bridge#formpart) | one part of a multipart body |
 

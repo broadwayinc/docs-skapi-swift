@@ -20,7 +20,7 @@ With a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.5.0"),
+    .package(url: "https://github.com/broadwayinc/skapi-swift.git", from: "2.7.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [.product(name: "Skapi", package: "skapi-swift")]),

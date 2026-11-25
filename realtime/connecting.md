@@ -37,7 +37,9 @@ final class ChatModel: ObservableObject {
 }
 ```
 
-Calling `connectRealtime` again while connected only swaps the callback.
+Calling `connectRealtime` again while connected only swaps the callback. That includes a connection skapi-swift opened on its own for [request status push](/api-bridge/forward-request#status-push): your call takes it over, and it is no longer closed for you. If that connection is still opening, `connectRealtime` waits for it and returns once it is open, or throws if it fails.
+
+Request status frames (code `CSR_STATUS`, which the server sends to every connection of a user who sent a forwarded request with `notify`, from this app or another of the user's apps) never reach your callback. Read them with [onRequestStatus](/api-reference/api-bridge#onrequeststatus).
 
 ## Events
 

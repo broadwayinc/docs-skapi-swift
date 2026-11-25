@@ -8,7 +8,7 @@ See [Connecting to Realtime](/realtime/connecting) and [Groups and Messages](/re
 func connectRealtime(_ callback: @escaping @Sendable (RealtimeEvent) -> Void) async throws
 ```
 
-Opens the realtime connection and returns once it is open. `callback` runs on a background task for every event; hop to the main actor for UI work. See [Events](/realtime/connecting#events). Called again while connected, it only swaps the callback. The connection reopens on its own after a drop.
+Opens the realtime connection and returns once it is open. `callback` runs on a background task for every event; hop to the main actor for UI work. See [Events](/realtime/connecting#events). Called again while connected, it only swaps the callback (also on a connection opened for [onRequestStatus](/api-reference/api-bridge#onrequeststatus), which is then yours and no longer closed for you; one still opening is waited for). The connection reopens on its own after a drop. Request status frames (`CSR_STATUS`) never reach `callback`.
 
 ```swift
 try await skapi.connectRealtime { event in
