@@ -51,7 +51,7 @@ let memberNotes = try await skapi.getRecords(["table": ["name": "notes", "access
 
 They cannot delete records either: [deleteRecords](/api-reference/database#deleterecords) needs a signed-in user. A record they create has a `user_id` that starts with `anonymous:`. It is temporary and names no user.
 
-**Signed-in users** can post records to any access group up to their own, and to `"private"`. They can update and delete only their own records, and not [read-only](/database/create#read-only-records) ones. Admins can delete any record.
+**Signed-in users** can post records to any access group up to their own, and to `"private"`. Above their own access group, a record must reference a record they were [granted private access](/database/private) to, and go no higher than that record's access group: see [References](/database/reference). They can update and delete only their own records, and not [read-only](/database/create#read-only-records) ones. Admins can delete any record.
 
 ## Reading while signed out
 

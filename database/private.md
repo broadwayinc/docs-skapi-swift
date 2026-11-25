@@ -31,7 +31,7 @@ try await skapi.grantPrivateRecordAccess([
 ])
 ```
 
-A granted user can read the record, even when it is private or above their own access group, and every record that references it. They can also [reference](/database/reference) it.
+A granted user can read the record, even when it is private or above their own access group, and every record that references it. They can also [reference](/database/reference) it. While the record is not private, a record that references it may go in an access group above their own, up to this record's access group; a private record lets no referencing record above their own access group.
 
 ## Removing access
 
@@ -62,6 +62,8 @@ try await skapi.listPrivateRecordAccess(["user_id": "<user id>"])
 
 It takes the [paging options](/database/fetch#paging) as `fetchOptions:`.
 
+Only users with access to the data can list. With `record_id`, the list is open to the record's uploader, the users it was shared with, the users with private access to the record it references, and the project owner and admins in access group `99`. With `user_id` alone, it is open to that user, the project owner and admins in access group `99`. Anyone else gets `INVALID_REQUEST`: `User has no access to list the private access of this record.` (or `... of this user.`), which does not say whether the record exists.
+
 ## Moving in and out of private
 
 Moving a record into or out of `"private"` removes **every** grant on it, in either direction. Grant again afterwards if those users should keep access. Only the record's uploader can move it across that line.
@@ -85,6 +87,6 @@ A private access key is valid for **1 hour**. skapi-swift renews it on its own: 
 let key = try await skapi.requestPrivateRecordAccessKey(["record_id": .string(recordId)])
 ```
 
-When your access comes from a record that the private record references, pass that record's ID as `reference_id`.
+When your access comes from a record that the private record references, pass that record's ID as `reference_id`. The key is given only when the private record references that record directly (its own `reference`, one level) and you uploaded that record or were granted private access to it. A grant on the private record itself is enough too, with or without the reference. Otherwise it throws `INVALID_REQUEST` with `User's private access for reference: "<reference_id>" does not exist.`, also when the private record does not exist.
 
 To hand a private file to someone without an account, make a [signed link](/database/files#links-that-work-without-sign-in) with `expires:`.

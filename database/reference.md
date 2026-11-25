@@ -33,6 +33,8 @@ try await skapi.postRecord(config: ["record_id": "<comment id>", "reference": .n
 
 A user cannot reference a record in a higher access group than their own, or a private record, unless the uploader [granted them private access](/database/private) to it.
 
+A referencing record can sit in an access group above the user's own only when the user was granted private access to the referenced record, and only up to the referenced record's access group. Being able to read the referenced record, or having uploaded it, is not enough: a reference to a `"public"` record, or to a private one, lets no record above the user's own access group. Admins and the project owner post in any access group. Otherwise it throws `INVALID_REQUEST` with `User has no access to this group. A record above your access group must reference a record you were granted, and stay at or below that record's access group.` (or, when the referenced record is private, `User has no access to this group. A private record lends no access group: a record that references it can be at most your own access group, or private.`) The same check runs on every update of such a record, also one that does not send `"reference"` again: once the user holds no grant on the referenced record, they can update the record only by moving it to an access group up to their own.
+
 ## Fetching references
 
 ```swift

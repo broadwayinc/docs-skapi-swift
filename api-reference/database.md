@@ -49,7 +49,7 @@ Creates a record, or updates the one named by `config["record_id"]`. Returns the
 | `readonly` | bool | |
 | `index` | object or `null` | `["name": String, "value": string, number or bool]`. `null` removes it. |
 | `tags` | array of strings, or a comma-separated string | `null` or `[]` removes them. |
-| `reference` | string, `["record_id"]`, `["unique_id"]` or `null` | `null` removes it. |
+| `reference` | string, `["record_id"]`, `["unique_id"]` or `null` | `null` removes it. A record above your access group must reference a record you were granted, at or below that record's access group. See [References](/database/reference). |
 | `source` | object | `referencing_limit` (number or `null`), `prevent_multiple_referencing`, `can_remove_referencing_records`, `can_modify_referencing_records`, `only_granted_can_reference`, `allow_granted_to_grant_others` (bools), `referencing_index_restrictions` (array of `["name", "value"?, "condition"?]`). See [Reference rules](/database/reference#reference-rules). |
 | `remove_bin` | array of URLs or `bin` objects, or `null` | Files to remove. `null` removes every file; `[]` removes nothing. |
 
@@ -78,6 +78,7 @@ Inside a config, `null` is written `nil` in a literal or `.null` elsewhere: `["r
 | `INVALID_REQUEST` | `Public users can only post records to public tables.` / `Public users cannot update existing records.` / `Public users cannot set unique_id for records.` / `Public users cannot remove files from records.` / `Public users cannot post subscription records.` |
 | `INVALID_REQUEST` | `User has no access to update this record.` |
 | `INVALID_REQUEST` | `Record is read only.` |
+| `INVALID_REQUEST` | `User has no access to this group.` (a record above your access group with no reference) / `User has no access to this group. A record above your access group must reference a record you were granted, and stay at or below that record's access group.` / `User has no access to this group. A private record lends no access group: a record that references it can be at most your own access group, or private.` (a reference that does not let the record go there; see [References](/database/reference)) |
 | `INVALID_REQUEST` | `"source.can_modify_referencing_records" can only be set when the record is created. Only the project owner and admins in access group 99 can turn it on for an existing record.` |
 | `INVALID_REQUEST` | `The referenced record's user can only change the data, tags and index of a record that references theirs, or unlink it (<field> differs).` / `The referenced record's user cannot update a private record.` / `User has no access to this group.` (see [Modifying referencing records](/database/reference#modifying-referencing-records)) |
 | `INVALID_REQUEST` | `Only the owner of a record can move it into or out of the private access group.` / `User has no access to change the private access of the record.` |
@@ -433,7 +434,7 @@ On an [encrypted](/database/encryption#sharing-a-record) record, the record's ke
 func listPrivateRecordAccess(_ params: JSON, fetchOptions: FetchOptions? = nil) async throws -> JSON
 ```
 
-Signed-in only. `params`: `["record_id"?: String, "user_id"?: a user ID or an array]`, at least one. Each item in `list` has `record_id` and `user_id`. See [Listing grants](/database/private#listing-grants).
+Signed-in only. `params`: `["record_id"?: String, "user_id"?: a user ID or an array]`, at least one. Each item in `list` has `record_id` and `user_id`. Only users with access to the data can list, see [Listing grants](/database/private#listing-grants).
 
 ### Errors
 
@@ -441,6 +442,7 @@ Signed-in only. `params`: `["record_id"?: String, "user_id"?: a user ID or an ar
 |---|---|
 | `INVALID_PARAMETER` | `Either record_id or user_id must be provided.` |
 | `INVALID_PARAMETER` | `user_id should be type: <string \| string[]>` / `User ID is invalid.` |
+| `INVALID_REQUEST` | `User has no access to list the private access of this record.` / `User has no access to list the private access of this user.` |
 
 ## requestPrivateRecordAccessKey
 
@@ -448,12 +450,12 @@ Signed-in only. `params`: `["record_id"?: String, "user_id"?: a user ID or an ar
 func requestPrivateRecordAccessKey(_ params: JSON) async throws -> String
 ```
 
-Signed-in only. `params`: `["record_id": String, "reference_id"?: String]`. Returns the key that opens the record's private files, and keeps it on the object. The key is valid for 1 hour; the kept key is returned until it is within a minute of expiring, then a fresh one is requested. [getFile](#getfile) calls this for you. `reference_id` is the record the private record references, when your access comes from that record. See [Private files](/database/private#private-files).
+Signed-in only. `params`: `["record_id": String, "reference_id"?: String]`. Returns the key that opens the record's private files, and keeps it on the object. The key is valid for 1 hour; the kept key is returned until it is within a minute of expiring, then a fresh one is requested. [getFile](#getfile) calls this for you. `reference_id` is the record the private record references, when your access comes from that record: the key is given only when `record_id` references it directly and you uploaded it or were granted private access to it, or you were granted the private record itself. See [Private files](/database/private#private-files).
 
 ### Errors
 
 | code | message |
 |---|---|
 | `INVALID_PARAMETER` | `Record ID is required.` / `Record ID should be type: <string \| string[]>` / `Reference ID should be type: <string>` |
-| `INVALID_REQUEST` | `User's private access for record: "<record_id>" does not exist.` / `User's private access for reference: "<reference_id>" does not exist.` |
+| `INVALID_REQUEST` | `User's private access for record: "<record_id>" does not exist.` / `User's private access for reference: "<reference_id>" does not exist.` (with `reference_id`: the record does not reference it directly, or you did not upload it and were not granted it, and you hold no grant on the record itself) |
 | `ERROR` | `Invalid private access key response.` |
