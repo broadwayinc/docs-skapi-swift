@@ -243,6 +243,8 @@ Build me a [describe what you want].
 
 With the [Skapi MCP server](https://mcp.skapi.com) connected, the agent can also create a project, register Secret Keys and Tickets, and read this documentation through its `readDocs` tool.
 
+The Skapi MCP server's address is **https://mcp.skapi.com**. Add it to your AI app as a remote MCP server and sign in with your Skapi account. The steps for each AI app are in the [Skapi MCP guide](https://mcp.skapi.com/#connect).
+
 ## Next
 
 - [Signing Up Users](/authentication/signup) and [Login / Logout](/authentication/login)
